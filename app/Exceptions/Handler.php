@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Slim\Psr7\Response;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -52,6 +53,15 @@ class Handler extends ExceptionHandler
             return response()->json(
                 $exception->toArray(),
                 $exception->getCode()
+            );
+        } elseif ($exception instanceof \Illuminate\Validation\ValidationException) {
+            return response()->json(
+                [
+                    'errors' => array_map(function ($error) {
+                        return ['message' => $error];
+                    }, $exception->errors())
+                ],
+                \Illuminate\Http\Response::HTTP_BAD_REQUEST
             );
         }
         return parent::render($request, $exception);
