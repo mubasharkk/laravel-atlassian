@@ -45,4 +45,15 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, \Throwable $exception)
+    {
+        if ($exception instanceof BadRequestException) {
+            return response()->json(
+                $exception->toArray(),
+                $exception->getCode()
+            );
+        }
+        return parent::render($request, $exception);
+    }
 }
